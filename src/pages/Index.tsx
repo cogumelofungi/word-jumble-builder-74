@@ -446,12 +446,6 @@ const Index = () => {
                   programs={programsByCategory.recentlyAdded}
                   onToggleFavorite={handleToggleFavorite}
                   onPlay={handlePlay}
-                  onCardClick={handleCardClick}
-                  selectedItem={selectedItem}
-                  isDragMode={isDragMode}
-                  draggedItem={draggedItem}
-                  draggedOver={draggedOver}
-                  onCancelDrag={handleCancelDrag}
                 />
               )}
 
