@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Play, Heart, Star, Calendar, Move } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,6 @@ interface ProgramCardProps {
   onPlay: (id: string) => void;
   compact?: boolean;
   onCardClick?: (id: string) => void;
-  onCardDoubleClick?: (id: string) => void;
   selectedItem?: string | null;
   isDragMode?: boolean;
   draggedItem?: string | null;
@@ -37,7 +36,6 @@ export function ProgramCard({
   onPlay, 
   compact = true,
   onCardClick,
-  onCardDoubleClick,
   selectedItem,
   isDragMode = false,
   draggedItem,
@@ -45,8 +43,6 @@ export function ProgramCard({
 }: ProgramCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const isSeries = program.category === "Série";
-  
-  const lastTapRef = useRef(0);
   
   // Estados derivados
   const isSelected = selectedItem === program.id;
@@ -83,8 +79,6 @@ export function ProgramCard({
           isDropTarget ? 'ring-2 ring-accent ring-offset-2 ring-offset-background animate-pulse' : ''
         }`}
         onClick={handleCardClick}
-        onDoubleClick={(e) => { e.stopPropagation(); onCardDoubleClick?.(program.id); }}
-        onTouchEnd={(e) => { const now = Date.now(); if (now - lastTapRef.current < 400) { e.stopPropagation(); onCardDoubleClick?.(program.id); } lastTapRef.current = now; }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         role="button"

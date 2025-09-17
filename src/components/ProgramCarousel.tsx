@@ -24,7 +24,6 @@ interface ProgramCarouselProps {
   onPlay: (id: string) => void;
   showProgress?: boolean;
   onCardClick?: (id: string) => void;
-  onCardDoubleClick?: (id: string) => void;
   selectedItem?: string | null;
   isDragMode?: boolean;
   draggedItem?: string | null;
@@ -39,7 +38,6 @@ export function ProgramCarousel({
   onPlay, 
   showProgress = false,
   onCardClick,
-  onCardDoubleClick,
   selectedItem,
   isDragMode = false,
   draggedItem,
@@ -221,7 +219,6 @@ export function ProgramCarousel({
                   onToggleFavorite={onToggleFavorite}
                   onPlay={onPlay}
                   onCardClick={onCardClick}
-                  onCardDoubleClick={onCardDoubleClick}
                   selectedItem={selectedItem}
                   isDragMode={isDragMode}
                   draggedItem={draggedItem}

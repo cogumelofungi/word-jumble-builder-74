@@ -25,8 +25,6 @@ const Index = () => {
   const [draggedOver, setDraggedOver] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [isDragMode, setIsDragMode] = useState(false);
-  const [lastClickTime, setLastClickTime] = useState<number>(0);
-  const [lastClickedId, setLastClickedId] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Get featured program (highest rated)
@@ -117,37 +115,33 @@ const Index = () => {
     };
   }, [programs]);
 
-  // Clique simples: abrir programa (quando não está em modo drag) ou soltar (quando está)
+  // Sistema de seleção e drag de dois cliques
   const handleCardClick = (id: string) => {
-    if (isDragMode && draggedItem && id !== draggedItem) {
+    if (selectedItem === id && !isDragMode) {
+      // Segundo clique: ativar modo drag
+      setIsDragMode(true);
+      setDraggedItem(id);
+      toast({
+        title: "Modo reorganização ativado",
+        description: "Clique em outra posição para mover o programa",
+        duration: 3000,
+      });
+    } else if (isDragMode && draggedItem && id !== draggedItem) {
       // Clique em destino durante modo drag
       handleDrop(draggedItem, id);
-      return;
+    } else if (!isDragMode) {
+      // Primeiro clique: selecionar
+      setSelectedItem(id);
+      setDraggedItem(null);
+      setDraggedOver(null);
+      
+      const program = programs.find(p => p.id === id);
+      toast({
+        title: "Programa selecionado",
+        description: `"${program?.title}" - Clique novamente para reorganizar`,
+        duration: 2000,
+      });
     }
-
-    if (isDragMode) {
-      // Se já está em modo drag, ignorar cliques que não são destinos
-      return;
-    }
-
-    // Fora do modo drag: um clique abre o programa
-    const program = programs.find(p => p.id === id);
-    if (program) {
-      handlePlay(id);
-    }
-  };
-  const handleCardDoubleClick = (id: string) => {
-    if (isDragMode) return;
-    setIsDragMode(true);
-    setDraggedItem(id);
-    setSelectedItem(id);
-    toast({
-      title: "Modo reorganização ativado",
-      description: "Clique em outra posição para mover o programa",
-      duration: 3000,
-    });
-    setLastClickTime(0);
-    setLastClickedId(null);
   };
 
   const handleCancelDrag = () => {
@@ -155,8 +149,6 @@ const Index = () => {
     setIsDragMode(false);
     setDraggedItem(null);
     setDraggedOver(null);
-    setLastClickTime(0);
-    setLastClickedId(null);
     
     toast({
       title: "Reorganização cancelada",
@@ -228,8 +220,6 @@ const Index = () => {
     setIsDragMode(false);
     setDraggedItem(null);
     setDraggedOver(null);
-    setLastClickTime(0);
-    setLastClickedId(null);
   };
 
   const handleToggleFavorite = (id: string) => {
@@ -407,7 +397,6 @@ const Index = () => {
                         onToggleFavorite={handleToggleFavorite}
                         onPlay={handlePlay}
                         onCardClick={handleCardClick}
-                        onCardDoubleClick={handleCardDoubleClick}
                         selectedItem={selectedItem}
                         isDragMode={isDragMode}
                         draggedItem={draggedItem}
@@ -438,7 +427,6 @@ const Index = () => {
                   onPlay={handlePlay}
                   showProgress={true}
                   onCardClick={handleCardClick}
-                  onCardDoubleClick={handleCardDoubleClick}
                   selectedItem={selectedItem}
                   isDragMode={isDragMode}
                   draggedItem={draggedItem}
@@ -455,7 +443,6 @@ const Index = () => {
                   onToggleFavorite={handleToggleFavorite}
                   onPlay={handlePlay}
                   onCardClick={handleCardClick}
-                  onCardDoubleClick={handleCardDoubleClick}
                   selectedItem={selectedItem}
                   isDragMode={isDragMode}
                   draggedItem={draggedItem}
@@ -483,7 +470,6 @@ const Index = () => {
                   onToggleFavorite={handleToggleFavorite}
                   onPlay={handlePlay}
                   onCardClick={handleCardClick}
-                  onCardDoubleClick={handleCardDoubleClick}
                   selectedItem={selectedItem}
                   isDragMode={isDragMode}
                   draggedItem={draggedItem}
