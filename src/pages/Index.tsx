@@ -117,52 +117,37 @@ const Index = () => {
     };
   }, [programs]);
 
-  // Sistema de seleção com double click
+  // Clique simples: abrir programa (quando não está em modo drag) ou soltar (quando está)
   const handleCardClick = (id: string) => {
-    const currentTime = Date.now();
-    const timeDiff = currentTime - lastClickTime;
-    const doubleClickThreshold = 400; // 400ms para detectar double click
-    
     if (isDragMode && draggedItem && id !== draggedItem) {
       // Clique em destino durante modo drag
       handleDrop(draggedItem, id);
       return;
     }
-    
+
     if (isDragMode) {
       // Se já está em modo drag, ignorar cliques que não são destinos
       return;
     }
-    
-    // Detectar double click
-    if (lastClickedId === id && timeDiff < doubleClickThreshold) {
-      // Double click detectado - ativar modo drag
-      setIsDragMode(true);
-      setDraggedItem(id);
-      setSelectedItem(id);
-      toast({
-        title: "Modo reorganização ativado",
-        description: "Clique em outra posição para mover o programa",
-        duration: 3000,
-      });
-      
-      // Reset do timer
-      setLastClickTime(0);
-      setLastClickedId(null);
-    } else {
-      // Primeiro clique - apenas registrar para detectar possível double click
-      setLastClickTime(currentTime);
-      setLastClickedId(id);
-      
-      // Limpar seleção anterior se não for double click
-      setTimeout(() => {
-        if (Date.now() - currentTime >= doubleClickThreshold) {
-          setSelectedItem(null);
-          setDraggedItem(null);
-          setDraggedOver(null);
-        }
-      }, doubleClickThreshold);
+
+    // Fora do modo drag: um clique abre o programa
+    const program = programs.find(p => p.id === id);
+    if (program) {
+      handlePlay(id);
     }
+  };
+  const handleCardDoubleClick = (id: string) => {
+    if (isDragMode) return;
+    setIsDragMode(true);
+    setDraggedItem(id);
+    setSelectedItem(id);
+    toast({
+      title: "Modo reorganização ativado",
+      description: "Clique em outra posição para mover o programa",
+      duration: 3000,
+    });
+    setLastClickTime(0);
+    setLastClickedId(null);
   };
 
   const handleCancelDrag = () => {
@@ -422,6 +407,7 @@ const Index = () => {
                         onToggleFavorite={handleToggleFavorite}
                         onPlay={handlePlay}
                         onCardClick={handleCardClick}
+                        onCardDoubleClick={handleCardDoubleClick}
                         selectedItem={selectedItem}
                         isDragMode={isDragMode}
                         draggedItem={draggedItem}
@@ -452,6 +438,7 @@ const Index = () => {
                   onPlay={handlePlay}
                   showProgress={true}
                   onCardClick={handleCardClick}
+                  onCardDoubleClick={handleCardDoubleClick}
                   selectedItem={selectedItem}
                   isDragMode={isDragMode}
                   draggedItem={draggedItem}
@@ -468,6 +455,7 @@ const Index = () => {
                   onToggleFavorite={handleToggleFavorite}
                   onPlay={handlePlay}
                   onCardClick={handleCardClick}
+                  onCardDoubleClick={handleCardDoubleClick}
                   selectedItem={selectedItem}
                   isDragMode={isDragMode}
                   draggedItem={draggedItem}
@@ -495,6 +483,7 @@ const Index = () => {
                   onToggleFavorite={handleToggleFavorite}
                   onPlay={handlePlay}
                   onCardClick={handleCardClick}
+                  onCardDoubleClick={handleCardDoubleClick}
                   selectedItem={selectedItem}
                   isDragMode={isDragMode}
                   draggedItem={draggedItem}
