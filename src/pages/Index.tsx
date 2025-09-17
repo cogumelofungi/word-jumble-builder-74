@@ -426,6 +426,12 @@ const Index = () => {
                   onToggleFavorite={handleToggleFavorite}
                   onPlay={handlePlay}
                   showProgress={true}
+                  onCardClick={handleCardClick}
+                  selectedItem={selectedItem}
+                  isDragMode={isDragMode}
+                  draggedItem={draggedItem}
+                  draggedOver={draggedOver}
+                  onCancelDrag={handleCancelDrag}
                 />
               )}
 
@@ -436,6 +442,12 @@ const Index = () => {
                   programs={programsByCategory.myList}
                   onToggleFavorite={handleToggleFavorite}
                   onPlay={handlePlay}
+                  onCardClick={handleCardClick}
+                  selectedItem={selectedItem}
+                  isDragMode={isDragMode}
+                  draggedItem={draggedItem}
+                  draggedOver={draggedOver}
+                  onCancelDrag={handleCancelDrag}
                 />
               )}
 
@@ -446,12 +458,6 @@ const Index = () => {
                   programs={programsByCategory.recentlyAdded}
                   onToggleFavorite={handleToggleFavorite}
                   onPlay={handlePlay}
-                  onCardClick={handleCardClick}
-                  selectedItem={selectedItem}
-                  isDragMode={false}
-                  draggedItem={draggedItem}
-                  draggedOver={draggedOver}
-                  onCancelDrag={handleCancelDrag}
                 />
               )}
 
@@ -463,6 +469,12 @@ const Index = () => {
                   programs={genrePrograms}
                   onToggleFavorite={handleToggleFavorite}
                   onPlay={handlePlay}
+                  onCardClick={handleCardClick}
+                  selectedItem={selectedItem}
+                  isDragMode={isDragMode}
+                  draggedItem={draggedItem}
+                  draggedOver={draggedOver}
+                  onCancelDrag={handleCancelDrag}
                 />
               ))}
 
