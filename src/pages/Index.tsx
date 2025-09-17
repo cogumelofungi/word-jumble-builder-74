@@ -25,6 +25,8 @@ const Index = () => {
   const [draggedOver, setDraggedOver] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [isDragMode, setIsDragMode] = useState(false);
+  const [lastClickTime, setLastClickTime] = useState<number>(0);
+  const [lastClickedId, setLastClickedId] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Get featured program (highest rated)
@@ -115,32 +117,51 @@ const Index = () => {
     };
   }, [programs]);
 
-  // Sistema de seleção e drag de dois cliques
+  // Sistema de seleção com double click
   const handleCardClick = (id: string) => {
-    if (selectedItem === id && !isDragMode) {
-      // Segundo clique: ativar modo drag
+    const currentTime = Date.now();
+    const timeDiff = currentTime - lastClickTime;
+    const doubleClickThreshold = 400; // 400ms para detectar double click
+    
+    if (isDragMode && draggedItem && id !== draggedItem) {
+      // Clique em destino durante modo drag
+      handleDrop(draggedItem, id);
+      return;
+    }
+    
+    if (isDragMode) {
+      // Se já está em modo drag, ignorar cliques que não são destinos
+      return;
+    }
+    
+    // Detectar double click
+    if (lastClickedId === id && timeDiff < doubleClickThreshold) {
+      // Double click detectado - ativar modo drag
       setIsDragMode(true);
       setDraggedItem(id);
+      setSelectedItem(id);
       toast({
         title: "Modo reorganização ativado",
         description: "Clique em outra posição para mover o programa",
         duration: 3000,
       });
-    } else if (isDragMode && draggedItem && id !== draggedItem) {
-      // Clique em destino durante modo drag
-      handleDrop(draggedItem, id);
-    } else if (!isDragMode) {
-      // Primeiro clique: selecionar
-      setSelectedItem(id);
-      setDraggedItem(null);
-      setDraggedOver(null);
       
-      const program = programs.find(p => p.id === id);
-      toast({
-        title: "Programa selecionado",
-        description: `"${program?.title}" - Clique novamente para reorganizar`,
-        duration: 2000,
-      });
+      // Reset do timer
+      setLastClickTime(0);
+      setLastClickedId(null);
+    } else {
+      // Primeiro clique - apenas registrar para detectar possível double click
+      setLastClickTime(currentTime);
+      setLastClickedId(id);
+      
+      // Limpar seleção anterior se não for double click
+      setTimeout(() => {
+        if (Date.now() - currentTime >= doubleClickThreshold) {
+          setSelectedItem(null);
+          setDraggedItem(null);
+          setDraggedOver(null);
+        }
+      }, doubleClickThreshold);
     }
   };
 
@@ -149,6 +170,8 @@ const Index = () => {
     setIsDragMode(false);
     setDraggedItem(null);
     setDraggedOver(null);
+    setLastClickTime(0);
+    setLastClickedId(null);
     
     toast({
       title: "Reorganização cancelada",
@@ -220,6 +243,8 @@ const Index = () => {
     setIsDragMode(false);
     setDraggedItem(null);
     setDraggedOver(null);
+    setLastClickTime(0);
+    setLastClickedId(null);
   };
 
   const handleToggleFavorite = (id: string) => {
