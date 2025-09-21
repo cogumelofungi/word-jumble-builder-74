@@ -13,6 +13,7 @@ import { Program, getPrograms, addProgram, updateProgram, deleteProgram, clearAl
 import { SeasonManager } from "@/components/SeasonManager";
 import { AdminProgramCard } from "@/components/AdminProgramCard";
 import { AddProgramDialog } from "@/components/AddProgramDialog";
+import { AdvancedVideoPlayer } from "@/components/AdvancedVideoPlayer";
 import { useTVDetection } from "@/hooks/use-tv-detection";
 
 const AdminPanel = () => {
@@ -20,6 +21,9 @@ const AdminPanel = () => {
   const [editingProgram, setEditingProgram] = useState<Program | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [currentVideo, setCurrentVideo] = useState<string>("");
+  const [currentProgram, setCurrentProgram] = useState<Program | null>(null);
+  const [activeTab, setActiveTab] = useState("programs");
+  const [showPlayerDialog, setShowPlayerDialog] = useState(false);
   const [showSeasonManager, setShowSeasonManager] = useState(false);
   const [jsonImportUrl, setJsonImportUrl] = useState("");
   const [isImporting, setIsImporting] = useState(false);
@@ -67,10 +71,16 @@ const AdminPanel = () => {
   };
 
   const handlePlayVideo = (program: Program) => {
+    setCurrentProgram(program);
+    
     if (program.videoUrl) {
       setCurrentVideo(program.videoUrl);
+      setShowPlayerDialog(true);
+      setActiveTab("player");
     } else if (program.link) {
-      window.open(program.link, '_blank');
+      setCurrentVideo(program.link);
+      setShowPlayerDialog(true);
+      setActiveTab("player");
     } else {
       toast({
         title: "Erro",
@@ -361,7 +371,7 @@ const AdminPanel = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="programs" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 max-w-lg">
             <TabsTrigger value="programs" className="flex items-center gap-2 text-xs">
               <Video className="w-4 h-4" />
@@ -724,13 +734,13 @@ const AdminPanel = () => {
               <CardHeader>
                 <CardTitle>Player de Vídeo</CardTitle>
                 <CardDescription>
-                  Player integrado para reproduzir vídeos dos programas cadastrados
+                  {currentProgram ? `Reproduzindo: ${currentProgram.title}` : "Player integrado para reproduzir vídeos dos programas cadastrados"}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {currentVideo ? (
+                {currentVideo && currentProgram ? (
                   <div className="space-y-4">
-                    <AspectRatio ratio={16 / 9} className="bg-charcoal-black rounded-lg overflow-hidden">
+                    <AspectRatio ratio={16 / 9} className="bg-black rounded-lg overflow-hidden">
                       <video 
                         src={currentVideo} 
                         controls 
@@ -740,17 +750,35 @@ const AdminPanel = () => {
                         Seu navegador não suporta o elemento de vídeo.
                       </video>
                     </AspectRatio>
-                    <div className="flex justify-between items-center">
-                      <p className="text-sm text-muted-foreground">
-                        Reproduzindo: {currentVideo}
-                      </p>
-                      <Button
-                        variant="outline"
-                        onClick={() => setCurrentVideo("")}
-                        className="border-border/50"
-                      >
-                        Fechar Player
-                      </Button>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div className="space-y-1">
+                        <h3 className="font-semibold">{currentProgram.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {currentProgram.genre} • {currentProgram.year} • {currentProgram.rating}/10
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {currentVideo}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowPlayerDialog(true)}
+                          className="border-border/50"
+                        >
+                          Player Avançado
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setCurrentVideo("");
+                            setCurrentProgram(null);
+                          }}
+                          className="border-border/50"
+                        >
+                          Fechar Player
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -758,27 +786,15 @@ const AdminPanel = () => {
                     <Video className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                     <h3 className="text-lg font-semibold mb-2">Nenhum vídeo selecionado</h3>
                     <p className="text-muted-foreground mb-4">
-                      Selecione um programa da lista para reproduzir
+                      Selecione um programa da aba "Conteúdo" para reproduzir aqui
                     </p>
-                    {programs.length > 0 && (
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
-                        {programs.filter(p => p.videoUrl).map((program) => (
-                          <div key={program.id} className="text-center">
-                            <div 
-                              className="program-card aspect-[2/3] cursor-pointer mb-2"
-                              onClick={() => handlePlayVideo(program)}
-                            >
-                              <img
-                                src={program.poster}
-                                alt={program.title}
-                                className="w-full h-full object-cover rounded-lg"
-                              />
-                            </div>
-                            <p className="text-sm font-medium">{program.title}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setActiveTab("programs")}
+                      className="border-border/50"
+                    >
+                      Ir para Conteúdo
+                    </Button>
                   </div>
                 )}
               </CardContent>
@@ -896,6 +912,16 @@ const AdminPanel = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Advanced Video Player Dialog */}
+      {currentProgram && currentVideo && (
+        <AdvancedVideoPlayer
+          isOpen={showPlayerDialog}
+          onClose={() => setShowPlayerDialog(false)}
+          videoUrl={currentVideo}
+          title={currentProgram.title}
+        />
       )}
     </div>
   );
