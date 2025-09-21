@@ -141,21 +141,7 @@ export function AdvancedVideoPlayer({
   if (youtubeId) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent 
-          className="fixed inset-0 w-full h-full p-0 m-0 bg-black border-0 z-50 max-w-none"
-          style={{ 
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            margin: 0,
-            padding: 0,
-            border: 'none',
-            maxWidth: 'none',
-            zIndex: 9999
-          }}
-        >
+        <DialogContent className="max-w-full w-screen h-screen p-0 m-0 bg-black border-0 [&>button]:text-white [&>button]:hover:bg-white/20 [&>button]:z-50">
           <VisuallyHidden>
             <DialogTitle>Player de vídeo: {title}</DialogTitle>
             <DialogDescription>Reproduzindo {title}</DialogDescription>
@@ -177,19 +163,7 @@ export function AdvancedVideoPlayer({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="fixed inset-0 w-full h-full p-0 m-0 bg-black border-0 z-50 max-w-none"
-        style={{ 
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          margin: 0,
-          padding: 0,
-          border: 'none',
-          maxWidth: 'none',
-          zIndex: 9999
-        }}
+        className="max-w-full w-screen h-screen p-0 m-0 bg-black border-0 [&>button]:text-white [&>button]:hover:bg-white/20 [&>button]:z-50"
         onPointerMove={showControlsTemporarily}
       >
         <VisuallyHidden>
